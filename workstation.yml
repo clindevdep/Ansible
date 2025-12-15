@@ -1,0 +1,319 @@
+---
+- name: Configure Ubuntu 25.10 workstation
+  hosts: localhost
+  become: true
+  gather_facts: true
+  collections:
+    - community.general
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_connection: local
+    ansible_become_method: sudo
+    username: "clindevdep"
+    home_dir: "/home/{{ username }}"
+    chezmoi_repo: "https://github.com/clindevdep/dotfiles.git"
+    install_gpu: false
+    apt_keys:
+      - name: brave_browser
+        dest: /usr/share/keyrings/brave-browser-archive-keyring.gpg
+        mode: "0644"
+        content_b64: |
+          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
+          kbRQuVgamiiUQxXFTKl9as07JA==
+      - name: nodesource
+        dest: /usr/share/keyrings/nodesource.gpg
+        mode: "0644"
+        content_b64: |
+          mQENBFdDN1ABCADaNd/I3j3tn40deQNgz7hB2NvT+syXe6k4ZmdiEcOfBvFrkS8BhNS67t93etHs
+          xEy7E0qwsZH32bKazMqe9zDwoa3aVImryjh6SHC9lMtW27JPHFeMSrkt9YmH1WMwWcRO6eSY9B3P
+          pazquhnvbammLuUojXRIxkDroy6Fw4UKmUNSRr329Ej87jRoR1B2/57Kfp2Y4+vFGGzSvh3AFQpB
+          Hq51qsNHALU6+8PjLfIt+5TPvaWRTB+kAZnQZkaIQM2nr1n3oj6ak2RATY/+kjLizgFWzgEfbCrb
+          syq68UoY5FPBnu4ZE3iDZpaIqwKr0seUC7iA1xM5eHi5kty1oB7HABEBAAG0Ik5Tb2xpZCA8bnNv
+          bGlkLWdwZ0Bub2Rlc291cmNlLmNvbT6JATgEEwECACIFAldDN1ACGwMGCwkIBwMCBhUIAgkKCwQW
+          AgMBAh4BAheAAAoJEC9ZtfmbG+C0y7wH/i4xnab36dtrYW7RZwL8i6ScNjMx4j9+U1kr/F6YtqWd
+          +JwCbBdar5zRghxPcYEq/qf7MbgAYcs1eSOuTOb7n7+oxUwdH2iCtHhKh3Jr2mRw1ks7BbFZPB5K
+          mkxHaEBfLT4d+I91ZuUdPXJ+0SXs9gzkDbz65Uhoz3W03aiF8HeL5JNARZFMbHHNVL05U1sTGTCO
+          tu+1c/33f3TulQ/XZ3Y4hwGCpLe0Tv7g7Lp3iLMZMWYPEa0a7S4u8he5IEJQLd8bE8jltcQvrdr3
+          Fm8kI2JgBJmUmX4PSfhuTCFaR/yeCt3UoW883bs9LfbTzIx9DJGpRIu8Y0IL3b4sj/GoZVq5AQ0E
+          V0M3UAEIAKrTaC62ayzqOIPa7nS90BHHck4Z33a2tZF/uof38xNOiyWGhT8uJeFoTTHn5SQq5Fty
+          u4K3K2fbbpuu/APQF05AaljzVkDGNMW4pSkgOasdysj831cussrHX2RYS22wg80k6C/Hwmh5F45f
+          aEuNxsV+bPx7oPUrt5n6GMx84vEP3i1+FDBi0pt/B/QnDFBXki1BGvJ35f5NwDefK8VaInxXP3ZN
+          /WIbtn5dqxppkV/YkO7GiJlpJlju9rf3kKUIQzKQWxFsbCAPIHoWv7rH9RSxgDithXtG6Yg5R1ae
+          BbJaPNXL9wpJYBJbiMjkAFaz4B95FOqZm3r7oHugiCGsHX0AEQEAAYkBHwQYAQIACQUCV0M3UAIb
+          DAAKCRAvWbX5mxvgtE/OB/0VN88DR3Y3fuqy7lq/dthkn7Dqm9YXdorZl3L152eEIF882aG8FE3q
+          ZdaLGjQO4oShAyNWmRfSGuoH0XERXAI9n0r8m4mDMxE6rtP7tHety/5M8x3CTyuMgx5GLDaEUvBu
+          snTD+/v/fBMwRK/cZ9du5PSG4R50rtst+oYyC2aox4I2SgjtF/cY7bECsZDplzatN3gv34PkcdIg
+          8SLHAVlL4N5tzumDeizRspcSyoy2K2+hwKU4C4+dekLLTg8rjnRROvplV2KtaEk6rxKtIRFDCoQn
+          g8wfJuIMrDNKvqZwFRGt7cbvW5MCnuH8MhItOl9Uxp1wHp6gtav/h8Gp6MBa
+    apt_repositories:
+      - name: brave-browser
+        types: ["deb"]
+        uris: ["https://brave-browser-apt-release.s3.brave.com/"]
+        suites: ["stable"]
+        components: ["main"]
+        architectures: ["amd64"]
+        signed_by: /usr/share/keyrings/brave-browser-archive-keyring.gpg
+      - name: nodesource
+        types: ["deb"]
+        uris: ["https://deb.nodesource.com/node_22.x"]
+        suites: ["nodistro"]
+        components: ["main"]
+        architectures: ["amd64"]
+        signed_by: /usr/share/keyrings/nodesource.gpg
+    apt_packages:
+      - age
+      - bat
+      - brave-browser
+      - build-essential
+      - curl
+      - eza
+      - fd-find
+      - ffmpeg
+      - fzf
+      - git
+      - gnupg
+      - nala
+      - ncdu
+      - nodejs
+      - p7zip-full
+      - remmina
+      - ripgrep
+      - timeshift
+      - xclip
+      - xsel
+      - zoxide
+      - zsh
+    optional_gpu_packages:
+      - nvidia-driver-580-open
+      - linux-modules-nvidia-580-open-generic-hwe-24.04
+    npm_global_packages:
+      - tldr
+      - openai
+      - "@openai/codex"
+      - "@anthropic-ai/claude-code"
+      - "@google/gemini-cli"
+
+  pre_tasks:
+    - name: Ensure apt key directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - /usr/share/keyrings
+        - /etc/apt/keyrings
+        - /etc/apt/trusted.gpg.d
+
+  tasks:
+    - name: Install repository keys
+      copy:
+        dest: "{{ item.dest }}"
+        content: "{{ item.content_b64 | b64decode }}"
+        owner: root
+        group: root
+        mode: "{{ item.mode | default('0644') }}"
+      loop: "{{ apt_keys }}"
+      loop_control:
+        label: "{{ item.dest }}"
+
+    - name: Configure third-party repositories
+      deb822_repository:
+        name: "{{ item.name }}"
+        types: "{{ item.types }}"
+        uris: "{{ item.uris }}"
+        suites: "{{ item.suites }}"
+        components: "{{ item.components }}"
+        architectures: "{{ item.architectures }}"
+        signed_by: "{{ item.signed_by }}"
+        state: present
+      loop: "{{ apt_repositories }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Refresh apt cache after adding repositories
+      apt:
+        update_cache: true
+        force_apt_get: true
+
+    - name: Install workstation packages
+      apt:
+        name: "{{ apt_packages }}"
+        state: present
+
+    - name: Install NVIDIA stack (set install_gpu=true to enable)
+      apt:
+        name: "{{ optional_gpu_packages }}"
+        state: present
+      when: install_gpu | bool
+
+    - name: Install snap packages
+      community.general.snap:
+        name: chezmoi
+        classic: true
+        state: present
+
+    - name: Ensure default shell is zsh
+      user:
+        name: "{{ username }}"
+        shell: /usr/bin/zsh
+
+    - name: Ensure user directories exist
+      file:
+        path: "{{ home_dir }}/{{ item.path }}"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: ".local/bin", mode: "0755" }
+        - { path: ".npm-global", mode: "0755" }
+        - { path: ".npm-cache", mode: "0755" }
+
+    - name: Deploy Oh My Zsh
+      become: false
+      git:
+        repo: https://github.com/ohmyzsh/ohmyzsh.git
+        dest: "{{ home_dir }}/.oh-my-zsh"
+        version: master
+        update: yes
+
+    - name: Ensure chezmoi config directory
+      become: false
+      file:
+        path: "{{ home_dir }}/.config/chezmoi"
+        state: directory
+        mode: "0700"
+
+    - name: Configure chezmoi to use age key
+      become: false
+      copy:
+        dest: "{{ home_dir }}/.config/chezmoi/chezmoi.toml"
+        mode: "0600"
+        content: |
+          encryption = "age"
+
+          [age]
+          identity = "~/.config/chezmoi/key.txt"
+
+    - name: Check for age key (copy your key before running apply)
+      become: false
+      stat:
+        path: "{{ home_dir }}/.config/chezmoi/key.txt"
+      register: chezmoi_age_key
+
+    - name: Initialize chezmoi repository
+      become: false
+      environment:
+        PATH: "/snap/bin:{{ ansible_env.PATH }}"
+      command: "chezmoi init {{ chezmoi_repo }}"
+      args:
+        creates: "{{ home_dir }}/.local/share/chezmoi/.git"
+      ignore_errors: true
+      register: chezmoi_init
+
+    - name: Update chezmoi repository
+      become: false
+      environment:
+        PATH: "/snap/bin:{{ ansible_env.PATH }}"
+      command: "chezmoi update"
+      when:
+        - chezmoi_age_key.stat.exists
+        - chezmoi_init is success
+      ignore_errors: true
+
+    - name: Apply chezmoi dotfiles
+      become: false
+      environment:
+        PATH: "/snap/bin:{{ ansible_env.PATH }}"
+      command: "chezmoi apply --force"
+      when:
+        - chezmoi_age_key.stat.exists
+        - chezmoi_init is success
+      ignore_errors: true
+
+    - name: Ensure npm configuration file
+      become: false
+      copy:
+        dest: "{{ home_dir }}/.npmrc"
+        mode: "0644"
+        content: |
+          cache={{ home_dir }}/.npm-cache
+          prefix={{ home_dir }}/.npm-global
+
+    - name: Install global npm packages
+      become: false
+      community.general.npm:
+        name: "{{ item }}"
+        global: true
+        state: present
+      loop: "{{ npm_global_packages }}"
+      environment:
+        NPM_CONFIG_PREFIX: "{{ home_dir }}/.npm-global"
+        PATH: "{{ home_dir }}/.npm-global/bin:/snap/bin:{{ ansible_env.PATH }}"
