@@ -131,6 +131,7 @@
       - brave-browser
       - build-essential
       - curl
+      - duf
       - eza
       - fd-find
       - ffmpeg
